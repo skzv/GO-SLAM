@@ -3,7 +3,7 @@
 MODE=$1
 EXPNAME=$2
 
-OUT_DIR=/home/yzhang/exps/goslam/Replica/
+OUT_DIR=${pwd}/out/replica
 
 scenes="office0 office1 office2 office3 office4 room0 room1 room2"
 

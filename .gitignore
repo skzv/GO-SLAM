@@ -3,7 +3,12 @@ output
 .vscode
 # 3rdparty
 Datasets
+datasets
 SUMMARY
+
+scripts/download_scannet.sh
+
+predicted
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

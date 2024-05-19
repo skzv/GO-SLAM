@@ -6,6 +6,8 @@ import matplotlib.colors as mcolors
 from scipy.ndimage import gaussian_filter, laplace, sobel, label, median_filter, binary_opening
 from skimage import filters, morphology, measure
 from skimage.transform import hough_line, hough_line_peaks, rotate, probabilistic_hough_line
+import trimesh
+from PIL import ImageFont
 
 def compute_density(pcd, bins_per_unit):
     # Get the points from the point cloud
@@ -262,6 +264,9 @@ def detect_principle_rotation_angle(edges):
 def rotate_edges(edges, angle):
     return rotate(edges, angle=angle, resize=True)
 
+# Function to create a text mesh using trimesh
+def create_text_mesh(text):
+    return o3d.t.geometry.TriangleMesh.create_text(text, depth=0.1).to_legacy()
 
 # Load the PLY file
 ply_file_path = 'predicted/predicted_rgbd_meshes/office1.ply'
@@ -274,6 +279,38 @@ print(pcd)
 # pcd = align_pcd_with_pca(pcd)
 
 # visualize_pcd(pcd)
+print("Open3D version:", o3d.__version__)
+
+# Initialize the GUI Application
+# app = o3d.visualization.gui.Application.instance
+# app.initialize()
+
+# Setup O3DVisualizer
+# vis = o3d.visualization.O3DVisualizer("Open3D - O3DVisualizer", 1024, 768)
+# vis.add_geometry("PointCloud", pcd)
+
+# Show the visualizer window
+# o3d.visualization.draw([vis])
+
+# Create a simple point cloud
+#pcd = o3d.geometry.PointCloud()
+#pcd.points = o3d.utility.Vector3dVector(np.random.rand(100, 3))
+
+# Create text mesh
+# text = "Hello, Open3D!"
+# text_mesh = o3d.t.geometry.TriangleMesh.create_text('Open3D', depth=1).to_legacy()
+# text_mesh.paint_uniform_color((0.4, 0.1, 0.9))
+
+# Position the text mesh
+# text_mesh.translate([0.5, 0.5, 0.5])
+
+# print(type(pcd))
+# print(type(text_mesh))
+
+mesh = o3d.geometry.TriangleMesh.create_sphere(radius=0.1)
+
+# Visualize the point cloud with text mesh
+o3d.visualization.draw_geometries([pcd, mesh], mesh_show_back_face=True)
 
 # Compute the density of the point cloud
 hist, xedges, yedges = compute_density(pcd, 100)
