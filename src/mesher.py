@@ -192,7 +192,10 @@ class Mesher(object):
             )
             
             depth_list_np = np.array(depth_list)
+            cfg = np.array([self.H, self.W, self.fx, self.fy, self.cx, self.cy])
+            np.save(f'{self.output}/mesh/cfg.npy', cfg)
             np.save(f'{self.output}/mesh/depth_list.npy', depth_list_np)
+            np.save(f'{self.output}/mesh/estimate_c2w_list.npy', estimate_c2w_list)
 
             self.depth_list = depth_list
 

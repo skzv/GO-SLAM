@@ -5,7 +5,7 @@ alias python=python3
 MODE=$1
 EXPNAME=$2
 
-OUT_DIR=$(pwd)/out/replica
+OUT_DIR=$(pwd)/out/replica/rgbd
 
 scenes="office0 office1 office2 office3 office4 room0 room1 room2"
 scenes="office0"
