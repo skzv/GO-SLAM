@@ -166,7 +166,8 @@ class DepthVideo:
             gt_c2w = self.poses_gt[index].clone().to(device)  # [4, 4]
 
             depth = est_depth
-
+            # print('depth estimate from mapping: %f, %f' % (depth.min(), depth.max()))
+            
             # if updated by mapping, the priority is decreased to lowest level, i.e., 0
             self.update_priority[index] *= decay
 

@@ -6,6 +6,8 @@ Datasets
 datasets
 SUMMARY
 
+out/
+
 scripts/download_scannet.sh
 
 predicted

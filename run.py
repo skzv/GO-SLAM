@@ -23,7 +23,7 @@ def backup_source_code(backup_directory):
         '.', '..', '.git*', '*pycache*', '*build', '*.fuse*', '*_drive_*',
         '*pretrained*', '*output*', '*media*', '*.so', '*.pyc', '*.Python',
         '*.eggs*', '*.DS_Store*', '*.idea*', '*.pth', '*__pycache__*', '*.ply',
-        '*exps*',
+        '*exps*', 'out', 'datasets'
     )
 
     if os.path.exists(backup_directory):
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     else:
         output_dir = args.output
 
-    backup_source_code(os.path.join(output_dir, 'code'))
+    # backup_source_code(os.path.join(output_dir, 'code'))
     config.save_config(cfg, f'{output_dir}/cfg.yaml')
 
     dataset = get_dataset(cfg, args, device=args.device)

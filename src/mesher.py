@@ -190,6 +190,11 @@ class Mesher(object):
             depth_list = extract_depth_from_mesh(
                 mesh, estimate_c2w_list, H=self.H, W=self.W, fx=self.fx, fy=self.fy, cx=self.cx, cy=self.cy, far=20.0
             )
+            
+            depth_list_np = np.array(depth_list)
+            np.save(f'{self.output}/mesh/depth_list.npy', depth_list_np)
+
+            self.depth_list = depth_list
 
             vertices = mesh.vertices[:, :3]
             mask, forecast_mask = self.point_masks(
@@ -329,6 +334,11 @@ class Mesher(object):
             if self.verbose:
                 print("\nINFO: Save mesh at {}!\n".format(mesh_out_file))
 
+            # Get first depth image for visualization
+            #depths = self.depth_list[0]
+            #c2w = c2w_list[0]
+            # compute points in world frame
+            
             del estimate_c2w_list, mesh, net, cull_mesh, forecast_mesh
 
             torch.cuda.empty_cache()
