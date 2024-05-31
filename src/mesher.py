@@ -51,6 +51,9 @@ class Mesher(object):
 
         os.makedirs(f'{self.output}/mesh/', exist_ok=True)
 
+        self.H_out, self.W_out = cfg['cam']['H_out'], cfg['cam']['W_out']
+        self.H_edge, self.W_edge = cfg['cam']['H_edge'], cfg['cam']['W_edge']
+
         self.H, self.W, self.fx, self.fy, self.cx, self.cy = slam.H, slam.W, slam.fx, slam.fy, slam.cx, slam.cy
 
     def point_masks(self,
@@ -192,7 +195,7 @@ class Mesher(object):
             )
             
             depth_list_np = np.array(depth_list)
-            cfg = np.array([self.H, self.W, self.fx, self.fy, self.cx, self.cy])
+            cfg = np.array([self.H, self.W, self.fx, self.fy, self.cx, self.cy, self.H_edge, self.W_edge])
             np.save(f'{self.output}/mesh/cfg.npy', cfg)
             np.save(f'{self.output}/mesh/depth_list.npy', depth_list_np)
             np.save(f'{self.output}/mesh/estimate_c2w_list.npy', estimate_c2w_list)

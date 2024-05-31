@@ -12,6 +12,8 @@ scripts/download_scannet.sh
 
 predicted
 
+pretrained
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
