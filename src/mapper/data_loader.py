@@ -45,10 +45,10 @@ class DataLoader:
             'fy': float(cfg[3]),
             'cx': float(cfg[4]),
             'cy': float(cfg[5]),
-            'H_edge': 0,
-            'W_edge': 0
-            # 'H_edge': int(cfg[6]),
-            # 'W_edge': int(cfg[7])
+            # 'H_edge': 0,
+            # 'W_edge': 0
+            'H_edge': int(cfg[6]),
+            'W_edge': int(cfg[7])
         }
         self.config = config
         
