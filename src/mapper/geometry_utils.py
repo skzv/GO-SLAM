@@ -14,13 +14,14 @@ def apply_mask_to_world_coordinates(world_coordinates, mask):
 
     return flattened_coordinates
 
-def world_coordinates_to_point_cloud(world_coordinates, mask=None):
-    flattened_coordinates = apply_mask_to_world_coordinates(world_coordinates, mask)
-
+def flattened_coordinates_to_point_cloud(flattened_coordinates):
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(flattened_coordinates)
-
     return pcd
+
+def world_coordinates_to_point_cloud(world_coordinates, mask=None):
+    flattened_coordinates = apply_mask_to_world_coordinates(world_coordinates, mask)
+    return flattened_coordinates_to_point_cloud(flattened_coordinates)
 
 def pixel_to_world_coordinates(image, depth_map, intrinsic_matrix, c2w_matrix):
     """

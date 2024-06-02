@@ -28,6 +28,10 @@ class DataLoader:
         c2w_est_path = self.base_out_path + 'estimate_c2w_list.npy'
         depths_path = self.base_out_path + 'depth_list.npy'
         return self.load_data(cfg_path, c2w_est_path, depths_path)
+    
+
+    def load_objects_per_frame_from_base_path(self):
+        return np.load(self.base_out_path + 'objects_per_frame.npy', allow_pickle=True)
 
 
     def load_data(self, cfg_path, c2w_est_path, depths_path):

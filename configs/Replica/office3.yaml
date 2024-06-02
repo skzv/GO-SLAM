@@ -5,5 +5,5 @@ mapping:
 meshing:
   gt_mesh_path: /home/yzhang/data/Replica/cull_replica_meshv2/office3.ply
 data:
-  input_folder: /home/yzhang/data/Replica/office3
-  output: /home/yzhang/exps/goslam/Replica/office3/rgbd
+  input_folder: /home/skz/cs231n/GO-SLAM-skz/datasets/Replica/office3
+  output: /home/skz/cs231n/GO-SLAM-skz/out/replica/office3/rgbd

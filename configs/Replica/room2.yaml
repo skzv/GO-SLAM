@@ -5,5 +5,5 @@ mapping:
 meshing:
   gt_mesh_path: /home/yzhang/data/Replica/cull_replica_meshv2/room2.ply
 data:
-  input_folder: /home/yzhang/data/Replica/room2
-  output: /home/yzhang/exps/goslam/Replica/room2/rgbdv2
+  input_folder: /home/skz/cs231n/GO-SLAM-skz/datasets/Replica/room2
+  output: /home/yzhang/exps/goslam/Replica/room2/rgbd

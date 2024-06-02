@@ -22,11 +22,10 @@ COCO_INSTANCE_CATEGORY_NAMES = [
 ]
 
 class ObjectDetector:
-    def __init__(self, threshold=0.75):
+    def __init__(self):
         # Load the pre-trained model
         self.model = fasterrcnn_resnet50_fpn(pretrained=True)
         self.model.eval()
-        self.threshold = threshold
 
         self.object_segmenter = object_segmenter.ObjectSegmenter()
 
@@ -50,26 +49,30 @@ class ObjectDetector:
         pred_scores = predictions[0]['scores']
 
         # Get where the score is above the threshold
-        above_threshold = pred_scores > self.threshold
-        pred_boxes = pred_boxes[above_threshold]
-        pred_labels = pred_labels[above_threshold]
-        pred_scores = pred_scores[above_threshold]
+        # above_threshold = pred_scores > self.threshold
+        # pred_boxes = pred_boxes[above_threshold]
+        # pred_labels = pred_labels[above_threshold]
+        # pred_scores = pred_scores[above_threshold]
 
         objects = []
 
         for box, label, score in zip(pred_boxes, pred_labels, pred_scores):
             
             mask_in_box_coordinates, mask_in_image_coordinates = self.object_segmenter.get_object_segmentation_mask(image, box)
+            label_str = COCO_INSTANCE_CATEGORY_NAMES[label.item()]
 
             objects.append({
                 "box": box,
-                "label": label,
+                "label": label_str,
                 "score": score,
                 "mask_in_box_coordinates": mask_in_box_coordinates,
                 "mask_in_image_coordinates": mask_in_image_coordinates
             })
 
         return objects
+    
+    def filter_objects_by_threshold(self, objects, threshold):
+        return [object for object in objects if object['score'] >= threshold]
 
     def visualize(self, objects, image):
         fig, ax = plt.subplots(1, figsize=(12, 9))
@@ -81,9 +84,8 @@ class ObjectDetector:
 
 def visualize_on_ax(ax, objects):
     for object in objects:
-        label_str = COCO_INSTANCE_CATEGORY_NAMES[object['label'].item()]
         xmin, ymin, xmax, ymax = object['box']
         width, height = xmax - xmin, ymax - ymin
         rect = patches.Rectangle((xmin, ymin), width, height, linewidth=2, edgecolor='r', facecolor='none')
         ax.add_patch(rect)
-        ax.text(xmin, ymin, f'{label_str} ({object["score"]:.2f})', bbox=dict(facecolor='yellow', alpha=0.5))
+        ax.text(xmin, ymin, f'{object["label"]} ({object["score"]:.2f})', bbox=dict(facecolor='yellow', alpha=0.5))

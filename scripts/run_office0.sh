@@ -8,7 +8,7 @@ EXPNAME=$2
 OUT_DIR=$(pwd)/out/replica/rgbd
 
 scenes="office0 office1 office2 office3 office4 room0 room1 room2"
-scenes="office1"
+# scenes="office1"
 
 echo "Running on Replica dataset..."
 
