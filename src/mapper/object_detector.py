@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from torchvision.transforms import functional as F
@@ -25,6 +26,7 @@ class ObjectDetector:
     def __init__(self):
         # Load the pre-trained model
         self.model = fasterrcnn_resnet50_fpn(pretrained=True)
+        # move model to cuda
         self.model.eval()
 
         self.object_segmenter = object_segmenter.ObjectSegmenter()
@@ -82,6 +84,17 @@ class ObjectDetector:
 
         plt.show()
 
+
+def show_mask(mask, ax, random_color=False):
+    if random_color:
+        color = np.concatenate([np.random.random(3), np.array([0.6])], axis=0)
+    else:
+        color = np.array([30/255, 144/255, 255/255, 0.6])
+    h, w = mask.shape[-2:]
+    mask_image = mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
+    ax.imshow(mask_image)
+
+
 def visualize_on_ax(ax, objects):
     for object in objects:
         xmin, ymin, xmax, ymax = object['box']
@@ -89,3 +102,4 @@ def visualize_on_ax(ax, objects):
         rect = patches.Rectangle((xmin, ymin), width, height, linewidth=2, edgecolor='r', facecolor='none')
         ax.add_patch(rect)
         ax.text(xmin, ymin, f'{object["label"]} ({object["score"]:.2f})', bbox=dict(facecolor='yellow', alpha=0.5))
+        show_mask(object['mask_in_image_coordinates'], ax, random_color=True)

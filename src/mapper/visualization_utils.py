@@ -39,7 +39,6 @@ class Visualizer:
         if objects is not None:
             object_detector.visualize_on_ax(axs[0], objects)
             object_detector.visualize_on_ax(axs[1], objects)
-
         plt.show()
 
     def get_frame(self, index):

@@ -342,6 +342,41 @@ def align_plane_to_axis(normal, target_axis):
     return rotation_matrix
 
 
+def create_plane_mesh(plane_model, size=1.0, resolution=10):
+    """
+    Create a plane mesh from a plane model.
+
+    Parameters:
+    - plane_model: The plane model coefficients [a, b, c, d] of the plane equation ax + by + cz + d = 0.
+    - size: The size of the plane (length of each side of the square plane).
+    - resolution: The number of subdivisions on the plane.
+
+    Returns:
+    - mesh: The plane mesh.
+    """
+    [a, b, c, d] = plane_model
+
+    # Create a grid of points on the plane
+    xx, yy = np.meshgrid(np.linspace(-size / 2, size / 2, resolution),
+                         np.linspace(-size / 2, size / 2, resolution))
+    zz = (-d - a * xx - b * yy) / c
+
+    # Create the vertices and triangles for the plane mesh
+    vertices = np.stack((xx.flatten(), yy.flatten(), zz.flatten()), axis=-1)
+    triangles = []
+    for i in range(resolution - 1):
+        for j in range(resolution - 1):
+            idx = i * resolution + j
+            triangles.append([idx, idx + 1, idx + resolution])
+            triangles.append([idx + 1, idx + 1 + resolution, idx + resolution])
+
+    mesh = o3d.geometry.TriangleMesh()
+    mesh.vertices = o3d.utility.Vector3dVector(vertices)
+    mesh.triangles = o3d.utility.Vector3iVector(triangles)
+    mesh.compute_vertex_normals()
+    return mesh
+
+
 def align_pcd_using_ransac(pcd_orig):
     # Step 1: Segment the largest plane using RANSAC
     plane_models = []
@@ -349,10 +384,10 @@ def align_pcd_using_ransac(pcd_orig):
 
     pcd = o3d.geometry.PointCloud(pcd_orig)
 
-    for _ in range(2):  # We need to find the two largest planes
-        plane_model, inliers = pcd.segment_plane(distance_threshold=0.1,
+    for _ in range(3):  # We need to find the two largest planes
+        plane_model, inliers = pcd.segment_plane(distance_threshold=0.05,
                                                 ransac_n=3,
-                                                num_iterations=1000)
+                                                num_iterations=5000)
         plane_models.append(plane_model)
         inliers_list.append(inliers)
         
@@ -361,10 +396,25 @@ def align_pcd_using_ransac(pcd_orig):
 
     # Retrieve the largest and second largest plane models
     largest_plane_model = plane_models[0]
-    second_largest_plane_model = plane_models[1]
+    second_largest_plane_model = plane_models[2]
 
     # Normal vectors of the planes
     largest_plane_normal = np.array(largest_plane_model[:3])
+    
+    # visualize plane and pcd
+    # visualize plane model
+
+    # vis = o3d.visualization.Visualizer()
+    # vis.create_window()
+    # for geo in [create_plane_mesh(largest_plane_model), pcd]:
+    #     vis.add_geometry(geo)
+
+    # opt = vis.get_render_option()
+    # opt.mesh_show_back_face = True  # Ensure back faces are rendered
+    
+    # vis.run()
+    # vis.destroy_window()
+
     second_largest_plane_normal = np.array(second_largest_plane_model[:3])
 
     # Step 2: Align the largest plane normal with the z-axis
@@ -375,7 +425,7 @@ def align_pcd_using_ransac(pcd_orig):
     rotation_matrix_1 = -rotation_matrix_1
 
     # Apply the first rotation to the point cloud
-    pcd = o3d.geometry.PointCloud(pcd_orig)
+    new_pcd = o3d.geometry.PointCloud(pcd_orig)
     # pcd.rotate(rotation_matrix_1)
     # rotate second largest plane normal
     second_largest_plane_normal_rotated = np.dot(rotation_matrix_1, second_largest_plane_normal)
@@ -388,7 +438,8 @@ def align_pcd_using_ransac(pcd_orig):
     rotation =  rotation_matrix_2 @ rotation_matrix_1
     # pcd.rotate(rotation)
     pcd.points = o3d.utility.Vector3dVector(np.dot(rotation, np.asarray(pcd.points).T).T)
-    return pcd, rotation
+    new_pcd.points = o3d.utility.Vector3dVector(np.dot(rotation, np.asarray(new_pcd.points).T).T)
+    return new_pcd, pcd, rotation
 
 def apply_rotation_to_all_objects(objects, rotation):
     for object in objects:

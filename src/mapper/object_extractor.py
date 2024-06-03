@@ -90,7 +90,7 @@ class ObjectExtractor:
             return False
         overlap = self.compute_overlap(object1['world_coordinates_cm'], object2['world_coordinates_cm'])
         # print("Overlap: ", overlap)
-        if overlap > 0.1:
+        if overlap > 0.05:
             return True
         return False
 

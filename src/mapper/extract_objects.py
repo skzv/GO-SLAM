@@ -12,8 +12,8 @@ import image_transform
 import object_extractor
 import tqdm
 
-base_out_path = '/home/skz/cs231n/GO-SLAM-skz/out/replica/rgbd/office0/first-try/mesh/'
-base_data_set_path = '/home/skz/cs231n/GO-SLAM-skz/datasets/Replica/office0/results/'
+base_out_path = '/home/skz/cs231n/GO-SLAM-skz/out/replica/rgbd/room0/first-try/mesh/'
+base_data_set_path = '/home/skz/cs231n/GO-SLAM-skz/datasets/Replica/room0/results/'
 mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
 
 data_loader = data_loader.DataLoader(base_out_path , base_data_set_path, mesh_path)
@@ -46,20 +46,19 @@ for idx in tqdm.tqdm(indices, desc="Extracting objects", unit="frame"):
     frame_path = data_loader.get_frame_path(idx)
     image = image_transformer.transform_image(frame_path)
     new_objects = object_detector.detect(image)
+    new_objects = object_detector.filter_objects_by_threshold(new_objects, 0.5)
     objects_per_frame[idx] = new_objects
 
     # new_objects = object_detector.filter_objects_by_threshold(new_objects, 0.75)
     new_objects = object_extractor.add_depth_to_objects(new_objects, idx)
-    # all_objects.append(new_objects)
-    # all_objects = object_extractor.merge_objects(all_objects, new_objects)
+
+    # print('Draw frame')
     # visualizer.draw_frame_and_estimated_depth_map(idx, new_objects)
+
     # visualizer.visualize_objects_with_mesh(idx, objects)
 
-# all_objects = object_extractor.finish_merging(all_objects)
 # objects = object_extractor.flatten_all_objects(all_objects)
 # visualizer.visualize_objects_with_mesh(all_objects)
-# visualizer.visualize_merged_objects_with_mesh(all_objects)
 
 # Save objects
 np.save(base_out_path + 'objects_per_frame.npy', objects_per_frame)
-# np.save(base_out_path + 'merged_objects.npy', objects)
