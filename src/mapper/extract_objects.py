@@ -12,8 +12,8 @@ import image_transform
 import object_extractor
 import tqdm
 
-base_out_path = '/home/skz/cs231n/GO-SLAM-skz/out/replica/rgbd/room0/first-try/mesh/'
-base_data_set_path = '/home/skz/cs231n/GO-SLAM-skz/datasets/Replica/room0/results/'
+base_out_path = '/home/skz/cs231n/GO-SLAM-skz/out/replica/rgbd/office0/first-try/mesh/'
+base_data_set_path = '/home/skz/cs231n/GO-SLAM-skz/datasets/Replica/office0/results/'
 mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
 
 data_loader = data_loader.DataLoader(base_out_path , base_data_set_path, mesh_path)

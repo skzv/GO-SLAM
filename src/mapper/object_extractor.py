@@ -88,9 +88,12 @@ class ObjectExtractor:
         # label and enough overlapping world coordinates
         if not object1['label'] == object2['label']:
             return False
-        overlap = self.compute_overlap(object1['world_coordinates_cm'], object2['world_coordinates_cm'])
+        # quantize to decimemeters
+        world_coordinates1 = (object1['world_coordinates_cm']/10).astype(int)
+        world_coordinates2 = (object2['world_coordinates_cm']/10).astype(int)
+        overlap = self.compute_overlap(world_coordinates1, world_coordinates2)
         # print("Overlap: ", overlap)
-        if overlap > 0.05:
+        if overlap > 0.02:
             return True
         return False
 

@@ -38,8 +38,27 @@ def get_object_boxes(all_objects):
         points = object['world_coordinates_cm'] / 100 # convert to meters
 
         # remove top and bottom 10% of points
-        points = points[points[:, 2] < np.percentile(points[:, 2], 90)]
-        points = points[points[:, 2] > np.percentile(points[:, 2], 10)]
+        x = 2
+        top_p_x = np.percentile(points[:, 0], 100-x)
+        bottom_p_x = np.percentile(points[:, 0], x)
+        top_p_y = np.percentile(points[:, 1], 100-x)
+        bottom_p_y = np.percentile(points[:, 1], x)
+        top_p_z = np.percentile(points[:, 2], 100-x)
+        bottom_p_z = np.percentile(points[:, 2], x)
+
+        points = points[points[:, 0] < top_p_x]
+        points = points[points[:, 0] > bottom_p_x]
+        points = points[points[:, 1] < top_p_y]
+        points = points[points[:, 1] > bottom_p_y]
+        points = points[points[:, 2] < top_p_z]
+        points = points[points[:, 2] > bottom_p_z]
+
+        # points = points[points[:, 0] < np.percentile(points[:, 0], 97)]
+        # points = points[points[:, 0] > np.percentile(points[:, 0], 3)]
+        # points = points[points[:, 1] < np.percentile(points[:, 1], 97)]
+        # points = points[points[:, 1] > np.percentile(points[:, 1], 3)]
+        # points = points[points[:, 2] < np.percentile(points[:, 2], 90)]
+        # points = points[points[:, 2] > np.percentile(points[:, 2], 10)]
 
         center_x = np.mean(points[:, 0])
         center_y = np.mean(points[:, 1])
@@ -113,9 +132,12 @@ def draw_boxes_with_labels(fig, ax, boxes):
         # rect = patches.Rectangle((box['x0'], box['y0']), box['width'], box['height'],
         #                          linewidth=2, edgecolor='b', facecolor='none')
         points_tuples = item['points_tuples']
-        polygon = create_patch_from_points(points_tuples)
-        # Add the rectangle to the plot
-        ax.add_patch(polygon)
+        try:
+            polygon = create_patch_from_points(points_tuples)
+            # Add the rectangle to the plot
+            ax.add_patch(polygon)
+        except:
+            print('Error creating polygon')
         
         # Add label
         ax.text(box['center_x'], box['center_y'] , label, color='white', backgroundcolor='black') 
