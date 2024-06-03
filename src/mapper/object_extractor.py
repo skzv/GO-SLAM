@@ -151,13 +151,13 @@ class ObjectExtractor:
 
     def remove_objects_below_count_threshold(self, all_objects, threshold):
         for label, objects in all_objects.items():
-            objects = [object for object in objects if object.get('merged_count', 3) >= threshold]
+            objects = [object for object in objects if object.get('merged_count', 1) >= threshold]
             all_objects[label] = objects
         return all_objects
 
-    def finish_merging(self, all_objects):
+    def finish_merging(self, all_objects, frame_count_threshold=2):
         all_objects = self.randomly_subsample_world_coordinates_for_all_objects(all_objects)
-        all_objects = self.remove_objects_below_count_threshold(all_objects, 1)
+        all_objects = self.remove_objects_below_count_threshold(all_objects, frame_count_threshold)
         self.count_objects(all_objects)
         return all_objects
 
