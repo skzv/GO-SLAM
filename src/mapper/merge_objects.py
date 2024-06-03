@@ -44,7 +44,7 @@ visualizer = visualization_utils.Visualizer(data_loader, depths_np, room_mesh, c
 # Extract objects
 for idx in tqdm.tqdm(indices, desc="Extracting objects", unit="frame"):
     new_objects = objects_per_frame[idx]
-    new_objects = object_detector.filter_objects_by_threshold(new_objects, 0.85)
+    new_objects = object_detector.filter_objects_by_threshold(new_objects, 0.9)
     new_objects = object_extractor.add_depth_to_objects(new_objects, idx)
     all_objects = object_extractor.merge_objects(all_objects, new_objects)
     

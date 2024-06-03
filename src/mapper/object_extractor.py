@@ -23,11 +23,12 @@ class ObjectExtractor:
 
             world_coordinates = geometry_utils.apply_mask_to_world_coordinates(world_coordinates, mask)
             object['world_coordinates_cm'] = self.quantize_world_coordinates_to_cm(world_coordinates)
-            object['3d_box_world_coordinates'] = self.min_max_3d_box(world_coordinates)
+            object['3d_box_world_coordinates'] = ObjectExtractor.min_max_3d_box(world_coordinates)
 
         return objects
 
-    def min_max_3d_box(self, pcd):
+
+    def min_max_3d_box(pcd):
         # pcd has format (N, 3) => (x, y, z)
         min_x = np.min(pcd[:, 0])
         max_x = np.max(pcd[:, 0])
@@ -102,7 +103,7 @@ class ObjectExtractor:
         object1['world_coordinates_cm'] = combined_coords
         # print(combined_coords.shape)
 
-        object1['3d_box_world_coordinates'] = self.min_max_3d_box(object1['world_coordinates_cm']/100)
+        object1['3d_box_world_coordinates'] = ObjectExtractor.min_max_3d_box(object1['world_coordinates_cm']/100)
         object1['merged_count'] = object1.get('merged_count', 1) +  object2.get('merged_count', 1)
         # print("Merged object with label", object1['label'], "from", object1['merged_count'], "frames")
 

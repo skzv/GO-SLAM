@@ -32,6 +32,10 @@ class DataLoader:
 
     def load_objects_per_frame_from_base_path(self):
         return np.load(self.base_out_path + 'objects_per_frame.npy', allow_pickle=True)
+    
+
+    def load_all_objects(self):
+        return np.load(self.base_out_path + 'merged_objects.npy', allow_pickle=True)
 
 
     def load_data(self, cfg_path, c2w_est_path, depths_path):

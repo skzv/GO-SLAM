@@ -3,7 +3,7 @@ mode: mono
 mapping:
   bound: [[-2.0, 2.0], [-2.0, 2.0], [-2.0, 2.0]]
 meshing:
-  gt_mesh_path: /home/yzhang/data/Replica/cull_replica_meshv2/room0.ply
+  gt_mesh_path: /home/skz/GO-SLAM-skz/datasets/Replica/cull_replica_meshv2/room0.ply
 data:
   input_folder: /home/skz/cs231n/GO-SLAM-skz/datasets/Replica/room0
   output: /home/skz/cs231n/GO-SLAM-skz/out/replica/room0/mono
