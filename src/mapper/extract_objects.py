@@ -34,7 +34,8 @@ indices = [750]
 frame_sampling_rate = 20
 indices = range(0, N, frame_sampling_rate)
 
-objects_per_frame = [[] for _ in range(N)]
+objects_per_frame = np.empty(N, dtype=object)
+objects_per_frame[:] = [[] for _ in range(N)]
 # all_objects = []
 
 object_detector = object_detector.ObjectDetector()
@@ -47,7 +48,7 @@ for idx in tqdm.tqdm(indices, desc="Extracting objects", unit="frame"):
     image = image_transformer.transform_image(frame_path)
     new_objects = object_detector.detect(image)
     new_objects = object_detector.filter_objects_by_threshold(new_objects, 0.5)
-    objects_per_frame[idx] = new_objects
+    objects_per_frame[idx] = np.array(new_objects)  # Convert new_objects to numpy array
 
     # new_objects = object_detector.filter_objects_by_threshold(new_objects, 0.75)
     new_objects = object_extractor.add_depth_to_objects(new_objects, idx)
@@ -61,4 +62,4 @@ for idx in tqdm.tqdm(indices, desc="Extracting objects", unit="frame"):
 # visualizer.visualize_objects_with_mesh(all_objects)
 
 # Save objects
-np.save(base_out_path + 'objects_per_frame.npy', objects_per_frame)
+np.save(base_out_path + 'objects_per_frame.npy', objects_per_frame, allow_pickle=True)
