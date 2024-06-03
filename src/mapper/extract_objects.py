@@ -11,10 +11,29 @@ import object_segmenter
 import image_transform
 import object_extractor
 import tqdm
+import cv2
+
 
 base_out_path = '/home/skz/cs231n/GO-SLAM-skz/out/replica/rgbd/room0/first-try/mesh/'
 base_data_set_path = '/home/skz/cs231n/GO-SLAM-skz/datasets/Replica/room0/results/'
 mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
+
+base_out_path = '/home/emailskpal/cs231nfinalproject/base/replica-rgbd/rgbd/room0/first-try/mesh/'
+base_data_set_path = '/home/emailskpal/cs231nfinalproject/GO-SLAM/datasets/Replica/room0/results/'
+mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
+
+
+# base_out_path = '/home/emailskpal/cs231nfinalproject/base/replica-rgbd/rgbd/office0/first-try/mesh/'
+# base_data_set_path = '/home/emailskpal/cs231nfinalproject/GO-SLAM/datasets/Replica/office0/results/'
+# mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
+
+# base_out_path = '/home/emailskpal/cs231nfinalproject/base/replica-rgbd/rgbd/office4/first-try/mesh/'
+# base_data_set_path = '/home/emailskpal/cs231nfinalproject/GO-SLAM/datasets/Replica/office4/results/'
+# mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
+
+# base_out_path = '/home/emailskpal/cs231nfinalproject/base/replica-rgbd/rgbd/room1/first-try/mesh/'
+# base_data_set_path = '/home/emailskpal/cs231nfinalproject/GO-SLAM/datasets/Replica/room1/results/'
+# mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
 
 data_loader = data_loader.DataLoader(base_out_path , base_data_set_path, mesh_path)
 data_loader.load()
@@ -31,7 +50,7 @@ camera = camera_utils.Camera(cfg, c2w_est)
 image_transformer = image_transform.ImageTransform(cfg['H'], cfg['W'], cfg['H_edge'], cfg['W_edge'])
 
 indices = [750]
-frame_sampling_rate = 20
+frame_sampling_rate = 10
 indices = range(0, N, frame_sampling_rate)
 
 objects_per_frame = np.empty(N, dtype=object)
@@ -45,8 +64,14 @@ visualizer = visualization_utils.Visualizer(data_loader, depths_np, room_mesh, c
 # Extract objects
 for idx in tqdm.tqdm(indices, desc="Extracting objects", unit="frame"):
     frame_path = data_loader.get_frame_path(idx)
+    print(frame_path)
     image = image_transformer.transform_image(frame_path)
-    new_objects = object_detector.detect(image)
+    # print(image)
+    # image = cv2.imread(frame_path)
+    plot = False
+    if 'frame000000' in frame_path or 'frame000540' in frame_path:
+        plot = True
+    new_objects = object_detector.detect(image,plot)
     new_objects = object_detector.filter_objects_by_threshold(new_objects, 0.5)
     objects_per_frame[idx] = np.array(new_objects)  # Convert new_objects to numpy array
 
@@ -61,5 +86,9 @@ for idx in tqdm.tqdm(indices, desc="Extracting objects", unit="frame"):
 # objects = object_extractor.flatten_all_objects(all_objects)
 # visualizer.visualize_objects_with_mesh(all_objects)
 
-# Save objects
-np.save(base_out_path + 'objects_per_frame.npy', objects_per_frame, allow_pickle=True)
+# # Save objects
+# np.save(base_out_path + 'objects_per_frame.npy', objects_per_frame, allow_pickle=True)
+
+
+objects_per_frame1 = np.asarray(objects_per_frame, dtype="object")
+np.save(base_out_path + 'objects_per_frame.npy', objects_per_frame1)

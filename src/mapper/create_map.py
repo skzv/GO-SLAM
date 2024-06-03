@@ -10,6 +10,25 @@ base_out_path = '/home/skz/cs231n/GO-SLAM-skz/out/replica/rgbd/room0/first-try/m
 base_data_set_path = '/home/skz/cs231n/GO-SLAM-skz/datasets/Replica/room0/results/'
 mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
 
+
+base_out_path = '/home/emailskpal/cs231nfinalproject/base/replica-rgbd/rgbd/room0/first-try/mesh/'
+base_data_set_path = '/home/emailskpal/cs231nfinalproject/GO-SLAM/datasets/Replica/room0/results/'
+mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
+
+
+# base_out_path = '/home/emailskpal/cs231nfinalproject/base/replica-rgbd/rgbd/office0/first-try/mesh/'
+# base_data_set_path = '/home/emailskpal/cs231nfinalproject/GO-SLAM/datasets/Replica/office0/results/'
+# mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
+
+# base_out_path = '/home/emailskpal/cs231nfinalproject/base/replica-rgbd/rgbd/office4/first-try/mesh/'
+# base_data_set_path = '/home/emailskpal/cs231nfinalproject/GO-SLAM/datasets/Replica/office4/results/'
+# mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
+
+
+# base_out_path = '/home/emailskpal/cs231nfinalproject/base/replica-rgbd/rgbd/room1/first-try/mesh/'
+# base_data_set_path = '/home/emailskpal/cs231nfinalproject/GO-SLAM/datasets/Replica/room1/results/'
+# mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
+
 data_loader = data_loader.DataLoader(base_out_path , base_data_set_path, mesh_path)
 data_loader.load()
 
@@ -32,11 +51,11 @@ object_boxes = map_utils.get_object_boxes(all_objects)
 #room_mesh = map_utils.align_pcd_with_pca(room_mesh)
 # map_utils.visualize_pcd(room_mesh)
 
-visualizer2 = visualization_utils.Visualizer(data_loader, depths_np, walls_removed, c2w_est, camera, image_transformer)
-visualizer2.visualize_objects_with_mesh(all_objects)
+# visualizer2 = visualization_utils.Visualizer(data_loader, depths_np, walls_removed, c2w_est, camera, image_transformer)
+# visualizer2.visualize_objects_with_mesh(all_objects)
 
-visualizer = visualization_utils.Visualizer(data_loader, depths_np, room_mesh, c2w_est, camera, image_transformer)
-visualizer.visualize_objects_with_mesh(all_objects)
+# visualizer = visualization_utils.Visualizer(data_loader, depths_np, room_mesh, c2w_est, camera, image_transformer)
+# visualizer.visualize_objects_with_mesh(all_objects)
 
 # Compute the density of the point cloud
 hist, xedges, yedges = map_utils.compute_density(room_mesh, 100)
