@@ -16,6 +16,24 @@ base_out_path = '/home/skz/cs231n/GO-SLAM-skz/out/replica/rgbd/room0/first-try/m
 base_data_set_path = '/home/skz/cs231n/GO-SLAM-skz/datasets/Replica/room0/results/'
 mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
 
+
+base_out_path = '/home/emailskpal/cs231nfinalproject/base/replica-rgbd/rgbd/room0/first-try/mesh/'
+base_data_set_path = '/home/emailskpal/cs231nfinalproject/GO-SLAM/datasets/Replica/room0/results/'
+mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
+
+
+# base_out_path = '/home/emailskpal/cs231nfinalproject/base/replica-rgbd/rgbd/office0/first-try/mesh/'
+# base_data_set_path = '/home/emailskpal/cs231nfinalproject/GO-SLAM/datasets/Replica/office0/results/'
+# mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
+
+# base_out_path = '/home/emailskpal/cs231nfinalproject/base/replica-rgbd/rgbd/office4/first-try/mesh/'
+# base_data_set_path = '/home/emailskpal/cs231nfinalproject/GO-SLAM/datasets/Replica/office4/results/'
+# mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
+
+# base_out_path = '/home/emailskpal/cs231nfinalproject/base/replica-rgbd/rgbd/room1/first-try/mesh/'
+# base_data_set_path = '/home/emailskpal/cs231nfinalproject/GO-SLAM/datasets/Replica/room1/results/'
+# mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
+
 data_loader = data_loader.DataLoader(base_out_path , base_data_set_path, mesh_path)
 data_loader.load()
 
@@ -53,8 +71,15 @@ for idx in tqdm.tqdm(indices, desc="Extracting objects", unit="frame"):
 
 all_objects = object_extractor.finish_merging(all_objects)
 objects = object_extractor.flatten_all_objects(all_objects)
-visualizer.visualize_objects_with_mesh(objects)
+# visualizer.visualize_objects_with_mesh(objects)
 # visualizer.visualize_merged_objects_with_mesh(objects)
 
 # Save objects
-np.save(base_out_path + 'merged_objects.npy', objects)
+# np.save(base_out_path + 'merged_objects.npy', objects)
+
+
+
+objects1 = np.asarray(objects, dtype="object")
+
+# Save objects
+np.save(base_out_path + 'merged_objects.npy', objects1)
