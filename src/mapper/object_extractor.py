@@ -81,7 +81,8 @@ class ObjectExtractor:
         overlap = len(set1.intersection(set2))
         total_unique_points = len(set1.union(set2))
     
-        return overlap / total_unique_points
+        return overlap / min(len(set1), len(set2))
+        # return overlap / total_unique_points
     
     def are_same_object(self, object1, object2):
         # two objects are considered the same if they have the same

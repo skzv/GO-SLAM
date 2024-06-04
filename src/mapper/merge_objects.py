@@ -51,7 +51,7 @@ else:
     frame_count_threshold = 1
 
 # Extract objects
-for idx in tqdm.tqdm(indices, desc="Extracting objects", unit="frame"):
+for idx in tqdm.tqdm(indices, desc="Merging objects", unit="frame"):
     new_objects = objects_per_frame[idx]
     if len(new_objects) == 0:
         continue
