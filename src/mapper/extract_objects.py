@@ -1,3 +1,4 @@
+import cv2
 from matplotlib import pyplot as plt
 import numpy as np
 import open3d as o3d
@@ -14,8 +15,8 @@ import object_extractor
 import tqdm
 
 
-scenes = ["office0", "office4", "room0", "room1", "room2"]
-scenes = ["room0"]
+scenes = ["office0", "office1", "office4", "room0", "room1", "room2"]
+scenes = ["office0"]
 for scene in scenes:
     # base_out_path = '/home/skz/cs231n/GO-SLAM-skz/out/replica/rgbd/office0/first-try/mesh/'
     # base_data_set_path = '/home/skz/cs231n/GO-SLAM-skz/datasets/Replica/office0/results/'
@@ -24,7 +25,7 @@ for scene in scenes:
     use_resnet = False
     draw_objects = False
 
-    base_out_path = '/home/skz/cs231n/GO-SLAM-skz/out/replica/rgbd/' + scene + '/first-try/mesh/'
+    base_out_path = '/home/skz/cs231n/GO-SLAM-skz/out/replica/mono/' + scene + '/first-try/mesh/'
     base_data_set_path = '/home/skz/cs231n/GO-SLAM-skz/datasets/Replica/' + scene + '/results/'
     mesh_path = base_out_path + 'final_raw_mesh_forecast.ply'
 
@@ -43,11 +44,11 @@ for scene in scenes:
     image_transformer = image_transform.ImageTransform(cfg['H'], cfg['W'], cfg['H_edge'], cfg['W_edge'])
 
     if use_resnet:
-        object_detector = object_detector.ObjectDetector()
+        object_detector_obj = object_detector.ObjectDetector()
         frame_sampling_rate = 20
     else:
         frame_sampling_rate = 5
-        object_detector = object_detector_detectron.ObjectDetectorDetectron()
+        object_detector_obj = object_detector_detectron.ObjectDetectorDetectron()
 
     indices = [750]
     # frame_sampling_rate = 20
@@ -56,25 +57,31 @@ for scene in scenes:
     objects_per_frame = np.empty(N, dtype=object)
     objects_per_frame[:] = [[] for _ in range(N)]
 
-    object_extractor = object_extractor.ObjectExtractor(c2w_est, depths_np, camera)
+    object_extractor_obj = object_extractor.ObjectExtractor(c2w_est, depths_np, camera)
     visualizer = visualization_utils.Visualizer(data_loader_obj, depths_np, room_mesh, c2w_est, camera, image_transformer)
 
     # Extract objects
     for idx in tqdm.tqdm(indices, desc="Extracting objects", unit="frame"):
         frame_path = data_loader_obj.get_frame_path(idx)
-        image = image_transformer.transform_image(frame_path)
-        new_objects = object_detector.detect(image)
-        new_objects = object_detector.filter_objects_by_threshold(new_objects, 0.5)
+        image = cv2.imread(frame_path)
+        
+        # detect objects in original frame
+        new_objects = object_detector_obj.detect(image, image_transformer)
+        new_objects = object_detector_obj.filter_objects_by_threshold(new_objects, 0.5)
+
         objects_per_frame[idx] = np.array(new_objects)  # Convert new_objects to numpy array
 
         # new_objects = object_detector.filter_objects_by_threshold(new_objects, 0.75)
-        new_objects = object_extractor.add_depth_to_objects(new_objects, idx)
+        new_objects = object_extractor_obj.add_depth_to_objects(new_objects, idx)
 
-        if draw_objects and len(new_objects) > 0:
+        if draw_objects and len(new_objects) > 0 and any(obj['label'] == 'door' for obj in new_objects):
+        # if draw_objects and len(new_objects) > 0:
             print('Draw frame')
             visualizer.draw_frame_and_estimated_depth_map(idx, new_objects)
 
-        # visualizer.visualize_objects_with_mesh(idx, objects)
+        if draw_objects and len(new_objects) > 0:
+            print('draw mesh')
+            visualizer.visualize_objects_with_mesh(new_objects, remove_walls=True)
 
     # objects = object_extractor.flatten_all_objects(all_objects)
     # visualizer.visualize_objects_with_mesh(all_objects)

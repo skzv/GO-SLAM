@@ -37,6 +37,9 @@ def get_object_boxes(all_objects):
         # project object into 2d
         points = object['world_coordinates_cm'] / 100 # convert to meters
 
+        if len(points) == 0:
+            continue
+
         # remove top and bottom 10% of points
         x = 2
         top_p_x = np.percentile(points[:, 0], 100-x)
@@ -52,6 +55,9 @@ def get_object_boxes(all_objects):
         points = points[points[:, 1] > bottom_p_y]
         points = points[points[:, 2] < top_p_z]
         points = points[points[:, 2] > bottom_p_z]
+
+        if len(points) == 0:
+            continue
 
         # points = points[points[:, 0] < np.percentile(points[:, 0], 97)]
         # points = points[points[:, 0] > np.percentile(points[:, 0], 3)]
@@ -69,8 +75,8 @@ def get_object_boxes(all_objects):
         min_y = np.min(points[:, 1])
         max_y = np.max(points[:, 1])
 
-        width = max(0.1, max_x - min_x)
-        height = max(0.1, max_y - min_y)
+        width = max(0.5, max_x - min_x)
+        height = max(0.5, max_y - min_y)
 
         box = {
             'x0': min_x,
@@ -158,7 +164,7 @@ def create_patch_from_points(points, color='blue', alpha=0.5):
     
     # Get the hull vertices
     hull_points = points[hull.vertices]
-    
+
     # Create a Polygon patch
     polygon = patches.Polygon(hull_points, closed=True, edgecolor='black', facecolor=color, alpha=alpha)
     
@@ -406,7 +412,9 @@ def align_pcd_using_ransac(pcd_orig):
 
     pcd = o3d.geometry.PointCloud(pcd_orig)
 
-    for _ in range(3):  # We need to find the two largest planes
+    num_planes = 2
+
+    for _ in range(num_planes):  # We need to find the two largest planes
         plane_model, inliers = pcd.segment_plane(distance_threshold=0.05,
                                                 ransac_n=3,
                                                 num_iterations=5000)
@@ -418,7 +426,8 @@ def align_pcd_using_ransac(pcd_orig):
 
     # Retrieve the largest and second largest plane models
     largest_plane_model = plane_models[0]
-    second_largest_plane_model = plane_models[2]
+    second_largest_plane_model = plane_models[num_planes - 1]
+    # second_largest_plane_model = plane_models[2]
 
     # Normal vectors of the planes
     largest_plane_normal = np.array(largest_plane_model[:3])
@@ -458,6 +467,10 @@ def align_pcd_using_ransac(pcd_orig):
     # Apply the second rotation to the point cloud
     # pcd.rotate(rotation_matrix_2)
     rotation =  rotation_matrix_2 @ rotation_matrix_1
+
+    # apply 180 deg rotation
+    rotation = np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]]) @ rotation
+
     # pcd.rotate(rotation)
     pcd.points = o3d.utility.Vector3dVector(np.dot(rotation, np.asarray(pcd.points).T).T)
     new_pcd.points = o3d.utility.Vector3dVector(np.dot(rotation, np.asarray(new_pcd.points).T).T)
@@ -468,7 +481,7 @@ def apply_rotation_to_all_objects(objects, rotation):
         world_coordinates = object['world_coordinates_cm'] / 100
         rotated_coordinates = np.dot(rotation, world_coordinates.T).T
         object['world_coordinates_cm'] = np.round(100 * rotated_coordinates).astype(int)
-        object['3d_box_world_coordinates'] = object_extractor.ObjectExtractor.min_max_3d_box(rotated_coordinates)
+        # object['3d_box_world_coordinates'] = object_extractor.ObjectExtractor.min_max_3d_box(rotated_coordinates)
     return objects
 
 def threshold_otsu_density(hist, threshold_factor):

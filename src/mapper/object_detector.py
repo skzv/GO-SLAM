@@ -26,12 +26,17 @@ class ObjectDetector:
     def __init__(self):
         # Load the pre-trained model
         self.model = fasterrcnn_resnet50_fpn(pretrained=True)
+
+        # Check if CUDA is available and move the model to GPU
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.model.to(self.device)
+
         # move model to cuda
         self.model.eval()
 
         self.object_segmenter = object_segmenter.ObjectSegmenter()
 
-    def detect(self, image):
+    def detect(self, image, image_transformer):
         # # Load an image
         # image = Image.open(image_path).convert("RGB")
 
@@ -40,6 +45,9 @@ class ObjectDetector:
 
         # Add a batch dimension
         image_tensor = image_tensor.unsqueeze(0)
+
+        # Move the image tensor to the same device as the model
+        image_tensor = image_tensor.to(self.device)  # This line is crucial
 
         # Perform inference
         with torch.no_grad():
@@ -58,9 +66,15 @@ class ObjectDetector:
 
         objects = []
 
+        image_transformed = image_transformer.transform_image(image)
+
         for box, label, score in zip(pred_boxes, pred_labels, pred_scores):
+
+            # transform image and boxes
+            box = box.cpu().numpy()
+            box = image_transformer.transform_object_box(box, image.shape)
             
-            mask_in_box_coordinates, mask_in_image_coordinates = self.object_segmenter.get_object_segmentation_mask(image, box)
+            mask_in_box_coordinates, mask_in_image_coordinates = self.object_segmenter.get_object_segmentation_mask(image_transformed, box)
             label_str = COCO_INSTANCE_CATEGORY_NAMES[label.item()]
 
             objects.append({

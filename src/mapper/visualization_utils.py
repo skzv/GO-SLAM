@@ -1,4 +1,5 @@
 
+import cv2
 from matplotlib import pyplot as plt
 import numpy as np
 import geometry_utils
@@ -23,7 +24,8 @@ class Visualizer:
 
         depth_map = self.depths[index]
         # image = self.get_frame(index)
-        image = self.data_loader.get_frame_path(index)
+        image_path = self.data_loader.get_frame_path(index)
+        image = cv2.imread(image_path)
         resized_image = self.image_transform.transform_image(image)
 
         fig, axs = plt.subplots(1, 2, figsize=(18, 6))
@@ -88,13 +90,33 @@ class Visualizer:
         camera_pose = self.camera_poses[index]
         self.visualize_objects_with_mesh(index, objects, camera_pose)
 
-    def visualize_objects_with_mesh(self, objects, camera_pose=None):
+    def visualize_objects_with_mesh(self, objects, camera_pose=None, remove_walls=False):
         # object keys:
         # "box"
         # "label"
         # "score"
         # "mask_in_box_coordinates"
         # "mask_in_image_coordinates"
+
+        # remove walls for vis
+        room_mesh = o3d.geometry.PointCloud(self.mesh)
+
+        if remove_walls:
+            num_planes = 3
+            inliers_list = []
+            for _ in range(num_planes):  # We need to find the two largest planes
+                plane_model, inliers = room_mesh.segment_plane(distance_threshold=0.1,
+                                                        ransac_n=3,
+                                                        num_iterations=5000)
+                
+                inliers_list.append(inliers)
+                
+                # Remove the inliers to find the next plane
+                room_mesh = room_mesh.select_by_index(inliers, invert=True)
+
+            # add back floor
+            room_mesh = o3d.geometry.PointCloud(self.mesh)
+            room_mesh = room_mesh.select_by_index([*inliers_list[0], *inliers_list[2]], invert=True)
 
         object_pcds = []
         text_labels = []
@@ -120,7 +142,7 @@ class Visualizer:
         # vis.add_geometry(text_labels[0])
         if camera_pose is None:
             camera_pose = o3d.geometry.PointCloud()
-        for geo in [origin, self.mesh, camera_pose, *object_pcds, *text_labels]:
+        for geo in [origin, room_mesh, camera_pose, *object_pcds, *text_labels]:
             vis.add_geometry(geo)
         # vis.add_geometry([origin, self.mesh, camera_pose, *object_pcds, *text_labels])
 

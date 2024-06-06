@@ -25,7 +25,7 @@ class ObjectDetectorDetectron:
 
         self.object_segmenter = object_segmenter.ObjectSegmenter()
 
-    def detect(self, image, plot=False):
+    def detect(self, image, image_transformer, plot=False):
         # Perform inference
         outputs = self.predictor(image)
         # print("Outputs:", outputs)
@@ -38,11 +38,17 @@ class ObjectDetectorDetectron:
 
         objects = []
 
+        image_transformed = image_transformer.transform_image(image)
+
         for box, label, score in zip(pred_boxes, pred_labels, pred_scores):
-            mask_in_box_coordinates, mask_in_image_coordinates = self.object_segmenter.get_object_segmentation_mask(image, box)
+            # transform image and boxes
+            box = box.cpu().numpy()
+            box = image_transformer.transform_object_box(box, image.shape)
+
+            mask_in_box_coordinates, mask_in_image_coordinates = self.object_segmenter.get_object_segmentation_mask(image_transformed, box)
 
             objects.append({
-                "box": box.cpu().numpy(),
+                "box": box,
                 "label": LOCAL_INSTANCE_CATEGORY_NAMES[label.item()],
                 "score": score.item(),
                 "mask_in_box_coordinates": mask_in_box_coordinates,
@@ -53,7 +59,7 @@ class ObjectDetectorDetectron:
 
         if plot:
             fig, ax = plt.subplots(1, figsize=(12, 9))
-            temp_visualize_on_ax(ax, objects, image)
+            temp_visualize_on_ax(ax, objects, image_transformed)
             plt.show()
 
 
